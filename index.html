@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Medisinapp for Guri — enkel versjon med stor skrift">
+<title>Guris medisinapp</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap');
+
+:root {
+  --bg: #faf8f5;
+  --card: #ffffff;
+  --ink: #1a1410;
+  --soft: #5a5048;
+  --border: #d8d0c4;
+  --accent: #1a6b3a;
+  --accent-bg: #e8f5ee;
+  --warn: #8b2020;
+  --warn-bg: #fceaea;
+  --blue: #1a4a7a;
+  --blue-bg: #e8f0fa;
+  --gold: #7a5a10;
+  --gold-bg: #fdf5e0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+*:focus-visible {
+  outline: 4px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+body {
+  font-family: 'Atkinson Hyperlegible', Georgia, serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1.5;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* SKIP LINK */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 4px;
+  z-index: 9999;
+  padding: 10px 20px;
+  background: var(--accent);
+  color: white;
+  border-radius: 0 0 8px 8px;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 18px;
+}
+.skip-link:focus { left: 8px; }
+
+/* HEADER */
+header {
+  background: var(--ink);
+  color: white;
+  padding: 24px 20px 20px;
+  text-align: center;
+}
+
+.header-name {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.clock-display {
+  font-size: 52px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin: 8px 0 4px;
+  line-height: 1;
+}
+
+.date-display {
+  font-size: 22px;
+  color: rgba(255,255,255,0.75);
+}
+
+/* MAIN */
+main {
+  padding: 20px 16px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* NEXT DOSE */
+.dose-banner {
+  background: var(--accent);
+  color: white;
+  border-radius: 20px;
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.dose-label {
+  font-size: 18px;
+  opacity: 0.85;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dose-time {
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.dose-countdown {
+  font-size: 22px;
+  opacity: 0.9;
+}
+
+/* SECTION TITLE */
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--soft);
+  margin: 24px 0 12px;
+}
+
+/* BIG BUTTONS */
+.big-btn {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding: 22px 20px;
+  border: 3px solid;
+  border-radius: 18px;
+  background: var(--card);
+  cursor: pointer;
+  margin-bottom: 14px;
+  text-align: left;
+  font-family: 'Atkinson Hyperlegible', Georgia, serif;
+  transition: transform 0.1s, opacity 0.1s;
+}
+
+.big-btn:active { transform: scale(0.97); opacity: 0.85; }
+
+.btn-icon {
+  font-size: 44px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.btn-text { flex: 1; }
+
+.btn-label {
+  font-size: 26px;
+  font-weight: 700;
+  display: block;
+  color: var(--ink);
+}
+
+.btn-sub {
+  font-size: 18px;
+  color: var(--soft);
+  margin-top: 2px;
+  display: block;
+}
+
+.big-btn.green { border-color: var(--accent); background: var(--accent-bg); }
+.big-btn.red   { border-color: var(--warn);   background: var(--warn-bg); }
+.big-btn.blue  { border-color: var(--blue);   background: var(--blue-bg); }
+.big-btn.gold  { border-color: var(--gold);   background: var(--gold-bg); }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 500;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--card);
+  border-radius: 28px 28px 0 0;
+  padding: 28px 20px 48px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-handle {
+  width: 48px;
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  margin: 0 auto 24px;
+}
+
+.modal-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* CHOICE BUTTONS IN MODAL */
+.choice-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.choice-btn {
+  padding: 20px 18px;
+  border: 3px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg);
+  font-family: 'Atkinson Hyperlegible', Georgia, serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  min-height: 72px;
+}
+
+.choice-btn.sel {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.choice-btn.sel-red {
+  border-color: var(--warn);
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+/* NOTE FIELD */
+.note-label {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--soft);
+  margin-bottom: 10px;
+}
+
+textarea {
+  width: 100%;
+  border: 3px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  font-family: 'Atkinson Hyperlegible', Georgia, serif;
+  font-size: 22px;
+  color: var(--ink);
+  background: var(--bg);
+  resize: none;
+  height: 100px;
+  outline: none;
+  margin-bottom: 20px;
+}
+
+textarea:focus-visible {
+  outline: 4px solid var(--accent);
+  outline-offset: 2px;
+  border-color: var(--accent);
+}
+
+/* SAVE / CANCEL */
+.save-btn {
+  width: 100%;
+  padding: 22px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-family: 'Atkinson Hyperlegible', Georgia, serif;
+  font-size: 26px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 12px;
+  min-height: 72px;
+}
+
+.cancel-btn {
+  width: 100%;
+  padding: 18px;
+  background: none;
+  color: var(--soft);
+  border: 3px solid var(--border);
+  border-radius: 16px;
+  font-family: 'Atkinson Hyperlegible', Georgia, serif;
+  font-size: 22px;
+  cursor: pointer;
+  min-height: 68px;
+}
+
+/* SCHEMA DISPLAY */
+.schema-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.schema-pill {
+  flex: 1;
+  text-align: center;
+  padding: 14px 4px;
+  border-radius: 14px;
+  border: 2px solid var(--accent);
+  background: var(--accent-bg);
+}
+
+.sp-time {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.sp-depot {
+  font-size: 13px;
+  color: var(--soft);
+  margin-top: 2px;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--ink);
+  color: white;
+  padding: 16px 28px;
+  border-radius: 100px;
+  font-size: 22px;
+  font-weight: 700;
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 999;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* LOG LIST */
+.log-entry {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  border: 2px solid var(--border);
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.log-time-big {
+  font-size: 26px;
+  font-weight: 700;
+  min-width: 60px;
+  color: var(--ink);
+}
+
+.log-body { flex: 1; }
+
+.log-type-label {
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.log-type-label.green { color: var(--accent); }
+.log-type-label.red   { color: var(--warn); }
+.log-type-label.blue  { color: var(--blue); }
+.log-type-label.gold  { color: var(--gold); }
+
+.log-detail-text {
+  font-size: 20px;
+  color: var(--soft);
+}
+
+.empty-msg {
+  text-align: center;
+  padding: 48px 20px;
+  font-size: 22px;
+  color: var(--soft);
+}
+
+
+/* BOTTOM TAB NAV */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--card);
+  border-top: 3px solid var(--border);
+  display: flex;
+  z-index: 200;
+}
+
+.nav-tab {
+  flex: 1;
+  padding: 14px 4px 18px;
+  border: none;
+  background: none;
+  font-family: 'Atkinson Hyperlegible', Georgia, serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--soft);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  min-height: 72px;
+  transition: color 0.15s;
+}
+
+.nav-tab .nav-icon { font-size: 28px; line-height: 1; }
+.nav-tab.active { color: var(--accent); }
+.nav-tab.active .nav-icon { transform: scale(1.1); }
+
+/* PAGE SECTIONS */
+.page { display: none; }
+.page.active { display: block; }
+
+body { padding-bottom: 100px; }
+
+/* TRENING */
+.exercise-card {
+  background: var(--card);
+  border-radius: 24px;
+  border: 3px solid var(--accent);
+  padding: 28px 22px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.exercise-done-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  border-radius: 100px;
+  padding: 8px 20px;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.exercise-icon {
+  font-size: 72px;
+  margin-bottom: 16px;
+  line-height: 1;
+  display: block;
+}
+
+.exercise-name {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--ink);
+}
+
+.exercise-desc {
+  font-size: 22px;
+  color: var(--soft);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.exercise-reps {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-radius: 12px;
+  padding: 10px 20px;
+  display: inline-block;
+  margin-bottom: 24px;
+}
+
+.do-it-btn {
+  width: 100%;
+  padding: 24px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 18px;
+  font-family: 'Atkinson Hyperlegible', Georgia, serif;
+  font-size: 28px;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 80px;
+  transition: opacity 0.15s;
+}
+
+.do-it-btn:active { opacity: 0.85; }
+.do-it-btn.done {
+  background: #888;
+  cursor: default;
+}
+
+.next-exercise-btn {
+  width: 100%;
+  padding: 18px;
+  background: none;
+  border: 3px solid var(--border);
+  border-radius: 16px;
+  font-family: 'Atkinson Hyperlegible', Georgia, serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--soft);
+  cursor: pointer;
+  margin-top: 12px;
+  min-height: 68px;
+}
+
+.streak-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.streak-circle {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--border);
+  border: 2px solid var(--border);
+}
+
+.streak-circle.done { background: var(--accent); border-color: var(--accent); }
+
+.why-card {
+  background: var(--blue-bg);
+  border: 2px solid var(--blue);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+
+.why-title {
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--blue);
+  margin-bottom: 8px;
+}
+
+.why-text {
+  font-size: 20px;
+  color: var(--soft);
+  line-height: 1.5;
+}
+
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Hopp til innhold</a>
+
+<header role="banner">
+  <div class="header-name">Hei, Guri 👋</div>
+  <div class="clock-display" id="clock">00:00</div>
+  <div class="date-display" id="dateDisplay"></div>
+</header>
+
+<nav class="bottom-nav" role="navigation" aria-label="Sidenavigasjon">
+  <button class="nav-tab active" onclick="goPage('medisin',this)" aria-selected="true" aria-label="Medisin">
+    <span class="nav-icon" aria-hidden="true">💊</span>Medisin
+  </button>
+  <button class="nav-tab" onclick="goPage('trening',this)" aria-selected="false" aria-label="Trening">
+    <span class="nav-icon" aria-hidden="true">🏃</span>Trening
+  </button>
+</nav>
+
+<main id="main">
+<div id="page-medisin" class="page active">
+
+  <!-- NESTE DOSE -->
+  <div class="dose-banner" role="region" aria-label="Neste Sinemet-dose" aria-live="polite">
+    <div class="dose-label">Neste medisin</div>
+    <div class="dose-time" id="nextDose">—</div>
+    <div class="dose-countdown" id="nextCountdown"></div>
+  </div>
+
+  <!-- SCHEMA -->
+  <div class="section-title">Medisintider</div>
+  <div class="schema-row" role="list" aria-label="Sinemet-schema">
+    <div class="schema-pill" role="listitem"><div class="sp-time">07:00</div></div>
+    <div class="schema-pill" role="listitem"><div class="sp-time">11:00</div></div>
+    <div class="schema-pill" role="listitem"><div class="sp-time">16:00</div></div>
+    <div class="schema-pill" role="listitem"><div class="sp-time">20:00</div></div>
+  </div>
+
+  <!-- KNAPPER -->
+  <div class="section-title">Hva vil du registrere?</div>
+
+  <button class="big-btn green" onclick="openModal('dose')" aria-label="Jeg tok medisinen">
+    <span class="btn-icon" aria-hidden="true">💊</span>
+    <span class="btn-text">
+      <span class="btn-label">Jeg tok medisinen</span>
+      <span class="btn-sub">Trykk etter du har tatt Sinemet</span>
+    </span>
+  </button>
+
+  <button class="big-btn red" onclick="openModal('symptom')" aria-label="Jeg er stiv eller skjelver">
+    <span class="btn-icon" aria-hidden="true">😣</span>
+    <span class="btn-text">
+      <span class="btn-label">Jeg er stiv / skjelver</span>
+      <span class="btn-sub">Si fra om hvordan du har det</span>
+    </span>
+  </button>
+
+  <button class="big-btn gold" onclick="openModal('pain')" aria-label="Jeg har smerter">
+    <span class="btn-icon" aria-hidden="true">🔥</span>
+    <span class="btn-text">
+      <span class="btn-label">Jeg har smerter</span>
+      <span class="btn-sub">Brennende, strekk eller annet</span>
+    </span>
+  </button>
+
+  <button class="big-btn blue" onclick="openModal('good')" aria-label="Jeg har det bra">
+    <span class="btn-icon" aria-hidden="true">😊</span>
+    <span class="btn-text">
+      <span class="btn-label">Jeg har det bra</span>
+      <span class="btn-sub">Godt å vite!</span>
+    </span>
+  </button>
+
+  <!-- LOGG -->
+  <div class="section-title">Hva har skjedd i dag</div>
+  <div id="logList" role="log" aria-live="polite" aria-label="Dagens hendelser"></div>
+
+
+</div><!-- end page-medisin -->
+
+<div id="page-trening" class="page" role="tabpanel" aria-label="Trening">
+  <div style="padding:20px 16px;max-width:500px;margin:0 auto">
+
+    <div class="section-title" style="margin-top:8px">Dagens øvelse</div>
+
+    <div class="streak-row" id="streakRow" aria-label="7 dager streak" role="img"></div>
+
+    <div class="exercise-card" id="exerciseCard">
+      <div class="exercise-icon" id="exIcon" aria-hidden="true">🪑</div>
+      <div class="exercise-name" id="exName">Reise seg fra stolen</div>
+      <div class="exercise-desc" id="exDesc">Sett deg på kanten av stolen. Reis deg opp sakte. Sett deg ned igjen. Ta deg god tid.</div>
+      <div class="exercise-reps" id="exReps">5 ganger</div>
+      <button class="do-it-btn" id="doItBtn" onclick="markDone()">
+        ✓ Jeg gjorde det!
+      </button>
+      <button class="next-exercise-btn" onclick="nextExercise()">
+        Vis en annen øvelse
+      </button>
+    </div>
+
+    <div class="why-card">
+      <div class="why-title">Hvorfor er dette bra?</div>
+      <div class="why-text" id="whyText">Trener bena og balansen. Hjelper kroppen å huske hvordan den skal reise seg trygt.</div>
+    </div>
+
+    <div class="why-card" style="background:var(--gold-bg);border-color:var(--gold)">
+      <div class="why-title" style="color:var(--gold)">Huskelapp</div>
+      <div class="why-text">
+        Én øvelse er nok. Litt er alltid bedre enn ingenting. 🌟
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</main>
+
+<!-- MODALER -->
+
+<!-- DOSE MODAL -->
+<div class="modal-overlay" id="m-dose" role="dialog" aria-modal="true" aria-labelledby="mt-dose" onclick="closeOut(event,'m-dose')">
+  <div class="modal">
+    <div class="modal-handle" aria-hidden="true"></div>
+    <div class="modal-title" id="mt-dose">💊 Medisinen er tatt</div>
+    <div class="section-title" style="margin-top:0">Hvordan har du det nå?</div>
+    <div class="choice-grid" role="group" aria-label="Tilstand etter dose">
+      <button class="choice-btn" onclick="selChoice(this,'feeling','😟 Stiv og treg')">😟 Stiv og treg</button>
+      <button class="choice-btn" onclick="selChoice(this,'feeling','😐 Ok, går greit')">😐 Ok, går greit</button>
+      <button class="choice-btn" onclick="selChoice(this,'feeling','😊 Bra, beveger meg fint')">😊 Bra, beveger meg fint</button>
+    </div>
+    <label class="note-label" for="note-dose">Vil du si noe mer? (valgfritt)</label>
+    <textarea id="note-dose" placeholder="Skriv her..."></textarea>
+    <button class="save-btn" onclick="saveEntry('dose')">✓ Lagre</button>
+    <button class="cancel-btn" onclick="closeModal('m-dose')">Avbryt</button>
+  </div>
+</div>
+
+<!-- SYMPTOM MODAL -->
+<div class="modal-overlay" id="m-symptom" role="dialog" aria-modal="true" aria-labelledby="mt-symptom" onclick="closeOut(event,'m-symptom')">
+  <div class="modal">
+    <div class="modal-handle" aria-hidden="true"></div>
+    <div class="modal-title" id="mt-symptom">😣 Hva kjenner du?</div>
+    <div class="choice-grid" role="group" aria-label="Type symptom">
+      <button class="choice-btn" onclick="selChoice(this,'symptom','Stiv i kroppen')">🔒 Stiv i kroppen</button>
+      <button class="choice-btn" onclick="selChoice(this,'symptom','Skjelving')">〰️ Skjelving</button>
+      <button class="choice-btn" onclick="selChoice(this,'symptom','Treg og langsom')">🐌 Treg og langsom</button>
+      <button class="choice-btn" onclick="selChoice(this,'symptom','Fryser fast')">❄️ Fryser fast</button>
+      <button class="choice-btn" onclick="selChoice(this,'symptom','Ser ting som ikke er der')">👁️ Ser ting</button>
+      <button class="choice-btn" onclick="selChoice(this,'symptom','Trøtt og sliten')">😴 Trøtt</button>
+    </div>
+    <label class="note-label" for="note-symptom">Vil du si noe mer? (valgfritt)</label>
+    <textarea id="note-symptom" placeholder="Skriv her..."></textarea>
+    <button class="save-btn" onclick="saveEntry('symptom')">✓ Lagre</button>
+    <button class="cancel-btn" onclick="closeModal('m-symptom')">Avbryt</button>
+  </div>
+</div>
+
+<!-- PAIN MODAL -->
+<div class="modal-overlay" id="m-pain" role="dialog" aria-modal="true" aria-labelledby="mt-pain" onclick="closeOut(event,'m-pain')">
+  <div class="modal">
+    <div class="modal-handle" aria-hidden="true"></div>
+    <div class="modal-title" id="mt-pain">🔥 Smerte</div>
+    <div class="section-title" style="margin-top:0">Hvor gjør det vondt?</div>
+    <div class="choice-grid" role="group" aria-label="Sted for smerte">
+      <button class="choice-btn" onclick="selChoice(this,'painloc','Venstre fot / ben')">Venstre fot / ben</button>
+      <button class="choice-btn" onclick="selChoice(this,'painloc','Høyre fot / ben')">Høyre fot / ben</button>
+      <button class="choice-btn" onclick="selChoice(this,'painloc','Arm eller skulder')">Arm eller skulder</button>
+      <button class="choice-btn" onclick="selChoice(this,'painloc','Rygg eller nakke')">Rygg eller nakke</button>
+      <button class="choice-btn" onclick="selChoice(this,'painloc','Flere steder')">Flere steder</button>
+    </div>
+    <div class="section-title">Hva slags smerte?</div>
+    <div class="choice-grid" role="group" aria-label="Type smerte">
+      <button class="choice-btn" onclick="selChoice(this,'paintype','Brennende')">🔥 Brennende</button>
+      <button class="choice-btn" onclick="selChoice(this,'paintype','Som senestrekk')">↔️ Som senestrekk</button>
+      <button class="choice-btn" onclick="selChoice(this,'paintype','Stikkende')">📍 Stikkende</button>
+      <button class="choice-btn" onclick="selChoice(this,'paintype','Dump og tung')">Dump og tung</button>
+    </div>
+    <label class="note-label" for="note-pain">Vil du si noe mer? (valgfritt)</label>
+    <textarea id="note-pain" placeholder="Skriv her..."></textarea>
+    <button class="save-btn" onclick="saveEntry('pain')">✓ Lagre</button>
+    <button class="cancel-btn" onclick="closeModal('m-pain')">Avbryt</button>
+  </div>
+</div>
+
+<!-- GOOD MODAL -->
+<div class="modal-overlay" id="m-good" role="dialog" aria-modal="true" aria-labelledby="mt-good" onclick="closeOut(event,'m-good')">
+  <div class="modal">
+    <div class="modal-handle" aria-hidden="true"></div>
+    <div class="modal-title" id="mt-good">😊 Så bra!</div>
+    <p style="font-size:24px;text-align:center;color:var(--soft);margin-bottom:24px;line-height:1.5">
+      Vil du si noe om hva du gjør eller har gjort?
+    </p>
+    <label class="note-label" for="note-good">Skriv gjerne (valgfritt)</label>
+    <textarea id="note-good" placeholder="F.eks: Gikk en tur, spiste godt..."></textarea>
+    <button class="save-btn" onclick="saveEntry('good')">✓ Lagre</button>
+    <button class="cancel-btn" onclick="closeModal('m-good')">Avbryt</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+const SINEMET = ['07:00','11:00','16:00','20:00'];
+let entries = JSON.parse(localStorage.getItem('guri_simple') || '[]');
+const mstate = {};
+let activeModal = null;
+
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+}
+
+function save() { localStorage.setItem('guri_simple', JSON.stringify(entries)); }
+
+// CLOCK
+function tick() {
+  const now = new Date();
+  const H = String(now.getHours()).padStart(2,'0');
+  const M = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('clock').textContent = H + ':' + M;
+
+  const days = ['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
+  const months = ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
+  document.getElementById('dateDisplay').textContent =
+    days[now.getDay()] + ' ' + now.getDate() + '. ' + months[now.getMonth()];
+
+  // Next dose
+  const cur = now.getHours() * 60 + now.getMinutes();
+  let best = null, bestD = Infinity;
+  SINEMET.forEach(t => {
+    const [h,m] = t.split(':').map(Number);
+    let d = h*60+m - cur;
+    if (d < 0) d += 1440;
+    if (d < bestD) { bestD = d; best = t; }
+  });
+  document.getElementById('nextDose').textContent = best;
+  const h = Math.floor(bestD/60), m = bestD % 60;
+  document.getElementById('nextCountdown').textContent =
+    h > 0 ? 'om ' + h + ' time' + (h>1?'r':'') + ' og ' + m + ' min' : 'om ' + m + ' minutter';
+}
+
+// MODAL
+function openModal(type) {
+  Object.keys(mstate).forEach(k => delete mstate[k]);
+  document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('sel','sel-red'));
+  activeModal = 'm-' + type;
+  document.getElementById(activeModal).classList.add('open');
+  document.getElementById(activeModal).querySelector('.modal').scrollTop = 0;
+}
+
+function closeModal(id) {
+  document.getElementById(id || activeModal).classList.remove('open');
+  activeModal = null;
+}
+
+function closeOut(e, id) {
+  if (e.target === document.getElementById(id)) closeModal(id);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && activeModal) closeModal();
+});
+
+function selChoice(btn, group, value) {
+  const container = btn.closest('[role="group"]');
+  container.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('sel','sel-red'));
+  btn.classList.add('sel');
+  mstate[group] = value;
+}
+
+function saveEntry(type) {
+  const noteEl = document.getElementById('note-' + type);
+  const note = noteEl ? noteEl.value.trim() : '';
+
+  const entry = {
+    id: Date.now(),
+    ts: new Date().toISOString(),
+    type,
+    data: { ...mstate },
+    note
+  };
+
+  entries.unshift(entry);
+  save();
+  closeModal('m-' + type);
+  showToast('✓ Lagret!');
+  renderLog();
+}
+
+// LOG
+function fmt(iso) {
+  const d = new Date(iso);
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function buildSummary(e) {
+  const d = e.data || {};
+  if (e.type === 'dose')    return d.feeling || 'Dose tatt';
+  if (e.type === 'symptom') return d.symptom || 'Symptom';
+  if (e.type === 'pain')    return [d.painloc, d.paintype].filter(Boolean).join(' — ') || 'Smerte';
+  if (e.type === 'good')    return e.note || 'Hadde det bra';
+  return '';
+}
+
+const typeConf = {
+  dose:    { icon: '💊', label: 'Medisin tatt', cls: 'green' },
+  symptom: { icon: '😣', label: 'Symptom',      cls: 'red' },
+  pain:    { icon: '🔥', label: 'Smerte',        cls: 'gold' },
+  good:    { icon: '😊', label: 'Hadde det bra', cls: 'blue' },
+};
+
+function renderLog() {
+  const tk = todayKey();
+  const todayEntries = entries.filter(e => {
+    const d = new Date(e.ts);
+    return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate() === tk;
+  });
+
+  const container = document.getElementById('logList');
+  if (!todayEntries.length) {
+    container.innerHTML = '<div class="empty-msg">Ingenting registrert ennå i dag.</div>';
+    return;
+  }
+
+  container.innerHTML = todayEntries.map(e => {
+    const conf = typeConf[e.type] || { icon: '📝', label: e.type, cls: 'blue' };
+    const summary = buildSummary(e);
+    return `
+      <div class="log-entry">
+        <div class="log-time-big">${fmt(e.ts)}</div>
+        <div class="log-body">
+          <div class="log-type-label ${conf.cls}">${conf.icon} ${conf.label}</div>
+          <div class="log-detail-text">${summary}${e.note && e.type !== 'good' ? '<br><em>' + e.note + '</em>' : ''}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+
+// ===== TRENING =====
+const exercises = [
+  {
+    icon: '🪑',
+    name: 'Reise seg fra stolen',
+    desc: 'Sett deg på kanten av stolen. Reis deg opp sakte. Sett deg ned igjen. Ta deg god tid.',
+    reps: '5 ganger',
+    why: 'Trener bena og balansen. Hjelper kroppen å huske hvordan den skal reise seg trygt.'
+  },
+  {
+    icon: '🦶',
+    name: 'Tråkk på stedet',
+    desc: 'Stå ved kjøkkenbenken og hold deg fast. Løft det ene beinet litt opp, sett det ned. Bytt bein.',
+    reps: '10 løft på hvert bein',
+    why: 'Bedrer balansen og styrker hoftemusklene. Rytmisk bevegelse er godt for Parkinson.'
+  },
+  {
+    icon: '🙌',
+    name: 'Klapp hendene',
+    desc: 'Sitt i stolen. Klapp hendene sammen rolig og jevnt. Tell med høyt stemme: 1, 2, 3...',
+    reps: '20 klapp',
+    why: 'Rytme og koordinasjon. Høy stemme trener talemusklene samtidig.'
+  },
+  {
+    icon: '🔄',
+    name: 'Snu hodet',
+    desc: 'Sitt rett opp. Snu hodet sakte til høyre, se over skulderen. Tilbake til midten. Snu til venstre.',
+    reps: '5 ganger på hver side',
+    why: 'Løsner stivhet i nakke og øvre rygg. Hjelper med å se seg rundt trygt.'
+  },
+  {
+    icon: '✊',
+    name: 'Knytt neven',
+    desc: 'Strekk fingrene helt ut. Knytt dem til en neve. Åpne igjen. Gjenta rolig.',
+    reps: '10 ganger på hver hånd',
+    why: 'Holder fingrene bevegelige. Bra mot stivhet i hendene.'
+  },
+  {
+    icon: '🚶',
+    name: 'Gå ti skritt',
+    desc: 'Gå ti skritt frem i rommet. Snu deg rolig. Gå ti skritt tilbake. Hold blikket fremover.',
+    reps: '3 turer frem og tilbake',
+    why: 'Gange er den beste treningen. Holder gangmønsteret aktivt og balansen god.'
+  },
+  {
+    icon: '😮‍💨',
+    name: 'Pust dypt',
+    desc: 'Sitt rett. Pust inn sakte gjennom nesen til 4. Hold til 2. Pust ut sakte gjennom munnen til 6.',
+    reps: '5 dype åndedrag',
+    why: 'Roer kroppen og gir bedre oksygen. Hjelper også mot stivhet i brystet.'
+  },
+  {
+    icon: '💪',
+    name: 'Strekk armene',
+    desc: 'Sitt i stolen. Strekk begge armene rett opp over hodet. Hold et sekund. Senk dem ned igjen.',
+    reps: '8 ganger',
+    why: 'Løsner stivhet i skuldrene og ryggen. Enkelt og trygt å gjøre sittende.'
+  },
+];
+
+let currentExIdx = parseInt(localStorage.getItem('guri_ex_idx_' + todayKey()) || '0') % exercises.length;
+let exerciseDoneToday = localStorage.getItem('guri_ex_done_' + todayKey()) === '1';
+
+function renderExercise() {
+  const ex = exercises[currentExIdx];
+  document.getElementById('exIcon').textContent = ex.icon;
+  document.getElementById('exName').textContent = ex.name;
+  document.getElementById('exDesc').textContent = ex.desc;
+  document.getElementById('exReps').textContent = ex.reps;
+  document.getElementById('whyText').textContent = ex.why;
+
+  const btn = document.getElementById('doItBtn');
+  const card = document.getElementById('exerciseCard');
+
+  if (exerciseDoneToday) {
+    btn.textContent = '✓ Gjort i dag! Bra jobba 🌟';
+    btn.classList.add('done');
+    btn.disabled = true;
+    card.style.borderColor = 'var(--accent)';
+  } else {
+    btn.textContent = '✓ Jeg gjorde det!';
+    btn.classList.remove('done');
+    btn.disabled = false;
+  }
+}
+
+function renderStreak() {
+  const row = document.getElementById('streakRow');
+  let dots = '';
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const k = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+    const done = localStorage.getItem('guri_ex_done_' + k) === '1';
+    dots += '<div class="streak-circle' + (done ? ' done' : '') + '" title="' + (done ? 'Trent' : 'Ikke trent') + '" role="img" aria-label="' + (done ? 'Trent' : 'Ikke trent') + '"></div>';
+  }
+  row.innerHTML = dots;
+}
+
+function markDone() {
+  if (exerciseDoneToday) return;
+  exerciseDoneToday = true;
+  localStorage.setItem('guri_ex_done_' + todayKey(), '1');
+
+  // Log it
+  entries.unshift({
+    id: Date.now(),
+    ts: new Date().toISOString(),
+    type: 'exercise',
+    data: { name: exercises[currentExIdx].name },
+    note: ''
+  });
+  save();
+  renderLog();
+  renderExercise();
+  renderStreak();
+  showToast('🌟 Kjempebra, Guri!');
+}
+
+function nextExercise() {
+  currentExIdx = (currentExIdx + 1) % exercises.length;
+  localStorage.setItem('guri_ex_idx_' + todayKey(), currentExIdx);
+  renderExercise();
+}
+
+// PAGE SWITCHING
+function goPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+  });
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+  if (id === 'trening') { renderExercise(); renderStreak(); }
+}
+
+// Add exercise to typeConf
+typeConf['exercise'] = { icon: '🏃', label: 'Trening', cls: 'green' };
+
+// INIT
+setInterval(tick, 1000);
+tick();
+renderLog();
+</script>
+</body>
+</html>
