@@ -179,8 +179,9 @@ textarea:focus-visible{outline:4px solid var(--accent);outline-offset:2px;border
     <div class="schema-row" role="list" aria-label="Sinemet-schema">
       <div class="schema-pill" role="listitem"><div class="sp-time">07:00</div></div>
       <div class="schema-pill" role="listitem"><div class="sp-time">11:00</div></div>
-      <div class="schema-pill" role="listitem"><div class="sp-time">16:00</div></div>
-      <div class="schema-pill" role="listitem"><div class="sp-time">20:00</div></div>
+      <div class="schema-pill" role="listitem"><div class="sp-time">14:00</div></div>
+      <div class="schema-pill" role="listitem"><div class="sp-time">17:00</div></div>
+      <div class="schema-pill" role="listitem"><div class="sp-time">21:00</div></div>
     </div>
 
     <div class="section-title">Hva vil du registrere?</div>
@@ -374,7 +375,7 @@ textarea:focus-visible{outline:4px solid var(--accent);outline-offset:2px;border
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script>
-const SINEMET = ['07:00','11:00','16:00','20:00'];
+const SINEMET = ['07:00','11:00','14:00','17:00','21:00'];
 let entries = JSON.parse(localStorage.getItem('guri_simple') || '[]');
 const mstate = {};
 const chipState = {}; // multi-select
@@ -629,8 +630,9 @@ function renderExercise(){
   document.getElementById('exReps').textContent=ex.reps;
   document.getElementById('whyText').textContent=ex.why;
   const btn=document.getElementById('doItBtn');
-  if(exDone){btn.textContent='✓ Gjort i dag! Bra jobba 🌟';btn.classList.add('done');btn.disabled=true;}
-  else{btn.textContent='✓ Jeg gjorde det!';btn.classList.remove('done');btn.disabled=false;}
+  btn.textContent = exDone ? '✓ Jeg gjorde det igjen!' : '✓ Jeg gjorde det!';
+  btn.classList.remove('done');
+  btn.disabled=false;
 }
 
 function renderSong(){
@@ -640,8 +642,9 @@ function renderSong(){
   document.getElementById('songInstruction').textContent=s.instruction;
   document.getElementById('songTip').textContent=s.tip;
   const btn=document.getElementById('singBtn');
-  if(songDone){btn.textContent='✓ Sunget i dag! Flott! 🎤';btn.classList.add('done');btn.disabled=true;}
-  else{btn.textContent='🎤 Jeg sang!';btn.classList.remove('done');btn.disabled=false;}
+  btn.textContent = songDone ? '🎤 Jeg sang igjen!' : '🎤 Jeg sang!';
+  btn.classList.remove('done');
+  btn.disabled=false;
 }
 
 function renderStreak(){
@@ -656,19 +659,17 @@ function renderStreak(){
 }
 
 function markExDone(){
-  if(exDone)return;
-  exDone=true;
   localStorage.setItem('guri_ex_done_'+todayKey(),'1');
+  exDone=true;
   entries.unshift({id:Date.now(),ts:new Date().toISOString(),type:'exercise',data:{name:exercises[exIdx].name},note:''});
-  save(); renderExercise(); renderStreak(); showToast('🌟 Kjempebra, Guri!');
+  save(); renderStreak(); showToast('🌟 Kjempebra, Guri!');
 }
 
 function markSongDone(){
-  if(songDone)return;
-  songDone=true;
   localStorage.setItem('guri_song_done_'+todayKey(),'1');
+  songDone=true;
   entries.unshift({id:Date.now(),ts:new Date().toISOString(),type:'song',data:{name:songs[songIdx].name},note:''});
-  save(); renderSong(); showToast('🎤 Supert! Stemmen takker deg!');
+  save(); showToast('🎤 Supert! Stemmen takker deg!');
 }
 
 function nextExercise(){
